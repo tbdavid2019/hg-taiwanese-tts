@@ -66,9 +66,19 @@ def _history_table(entries: List[Dict]) -> List[Dict]:
 
 def fetch_tts(text: str, model: str) -> Tuple[str, Dict]:
     payload = {"text": text, "model": model}
-    response = requests.post(API_URL, json=payload, headers=API_HEADERS, timeout=60)
-    response.raise_for_status()
-    data = response.json()
+    try:
+        response = requests.post(API_URL, json=payload, headers=API_HEADERS, timeout=60)
+        response.raise_for_status()
+        data = response.json()
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "N/A"
+        detail = exc.response.text[:300] if exc.response is not None else str(exc)
+        raise gr.Error(f"TTS API 呼叫失敗 (HTTP {status}): {detail}")
+    except requests.RequestException as exc:
+        raise gr.Error(f"TTS API 連線失敗：{exc}")
+    except ValueError:
+        raise gr.Error("TTS API 回傳非 JSON 內容。")
+
     audio_url = data.get("converted_audio_url") or data.get("audio_url")
     if not audio_url:
         raise gr.Error("TTS API 回傳內容缺少音檔網址 (audio_url)。")
@@ -153,7 +163,7 @@ css = """
 }
 """
 
-with gr.Blocks(title="台語 TTS", css=css) as demo:
+with gr.Blocks(title="台語 TTS") as demo:
     gr.Markdown(
         textwrap.dedent(
             """
@@ -235,4 +245,4 @@ with gr.Blocks(title="台語 TTS", css=css) as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(css=css)
