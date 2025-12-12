@@ -1,5 +1,5 @@
 ---
-title: Taiwanese Tts
+title: Taiwanese TTS
 emoji: 👁
 colorFrom: gray
 colorTo: gray
@@ -29,7 +29,7 @@ python3 app.py
 開啟終端顯示的網址（預設 7860）操作。
 
 ## 使用方式
-- 輸入台語文字並選擇模型（目前預設 `model6`），點擊「產生語音」。
+- 輸入台語文字並選擇模型（目前可用：`model5`、`model6`、`model7`；預設 `model6`），點擊「產生語音」。
 - 轉換後可直接播放音檔；同時會顯示 API 回傳的狀態訊息、白話字（Tailo）與 IPA。
 - 下方歷史區域可重播任一紀錄或重新載入最新紀錄。最多保留 50 筆，超出會自動覆蓋最舊項目。
 

@@ -51,17 +51,17 @@ def _history_options(entries: List[Dict]) -> List[str]:
 
 
 def _history_table(entries: List[Dict]) -> List[Dict]:
-    table = []
+    rows = []
     for entry in entries:
-        table.append(
-            {
-                "Time (UTC)": entry.get("time", ""),
-                "Model": entry.get("model", ""),
-                "Text": _format_preview(entry.get("text", "")),
-                "Audio URL": entry.get("audio_url", ""),
-            }
+        rows.append(
+            [
+                entry.get("time", ""),
+                entry.get("model", ""),
+                _format_preview(entry.get("text", "")),
+                entry.get("audio_url", ""),
+            ]
         )
-    return table
+    return rows
 
 
 def fetch_tts(text: str, model: str) -> Tuple[str, Dict]:
@@ -182,7 +182,7 @@ with gr.Blocks(title="台語 TTS") as demo:
     with gr.Row():
         model_input = gr.Dropdown(
             label="模型",
-            choices=["model6"],
+            choices=["model5", "model6", "model7"],
             value="model6",
         )
         submit_btn = gr.Button("產生語音", variant="primary")
