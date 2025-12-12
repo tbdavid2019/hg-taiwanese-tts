@@ -11,6 +11,8 @@ short_description: 台語TTS
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 
+
+---
 ## 專案說明
 這是一個台語文字轉語音介面，使用 Gradio 建立。介面會呼叫外部 TTS API（`https://learn-language.tokyo/taigiTTS/taigi-text-to-speech`），將使用者輸入的台語文字轉成語音並播放，同時保留最近 50 筆歷史紀錄（儲存在 `data/history.json`）。在 Hugging Face Spaces 可設定持久儲存以保存歷史。
 
