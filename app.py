@@ -88,7 +88,29 @@ def fetch_tts(text: str, model: str) -> Tuple[str, Dict]:
 def handle_tts(text: str, model: str):
     text = text.strip()
     if not text:
-        raise gr.Error("請輸入要轉成語音的文字。")
+        history = _load_history()
+        options = _history_options(history)
+        table = _history_table(history)
+        print(
+            json.dumps(
+                {
+                    "event": "tts_input_missing",
+                    "time": _now_iso(),
+                    "model": model,
+                    "text": "",
+                },
+                ensure_ascii=False,
+            ),
+            flush=True,
+        )
+        return (
+            None,
+            "請先輸入要轉成語音的文字喔！",
+            "",
+            "",
+            gr.update(choices=options, value=options[0] if options else None),
+            table,
+        )
 
     audio_url, data = fetch_tts(text, model)
 
@@ -108,6 +130,22 @@ def handle_tts(text: str, model: str):
 
     options = _history_options(history)
     table = _history_table(history)
+    print(
+        json.dumps(
+            {
+                "event": "tts_requested",
+                "time": new_entry["time"],
+                "model": model,
+                "text": text,
+                "text_length": len(text),
+                "audio_url": audio_url,
+                "tailuo": data.get("tailuo", ""),
+                "ipa": data.get("ipa", ""),
+            },
+            ensure_ascii=False,
+        ),
+        flush=True,
+    )
 
     return (
         audio_url,
@@ -154,6 +192,10 @@ def refresh_history():
     return gr.update(choices=options, value=options[0] if options else None), table
 
 
+def _toggle_submit_button(text: str):
+    return gr.update(interactive=bool(text.strip()))
+
+
 css = """
 :root {
   --section-gap: 12px;
@@ -178,6 +220,7 @@ with gr.Blocks(title="台語 TTS") as demo:
             label="輸入文字",
             placeholder="輸入要轉成語音的句子，支援多行。",
             lines=4,
+            value="我欲講台語，請轉成語音。",
         )
     with gr.Row():
         model_input = gr.Dropdown(
@@ -221,6 +264,12 @@ with gr.Blocks(title="台語 TTS") as demo:
             history_selector,
             history_table,
         ],
+    )
+    text_input.change(
+        fn=_toggle_submit_button,
+        inputs=text_input,
+        outputs=submit_btn,
+        queue=False,
     )
 
     history_selector.change(
